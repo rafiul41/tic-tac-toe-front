@@ -1,6 +1,8 @@
 import './App.scss';
 import React, {Component} from 'react';
 import Board from './../components/Board';
+import axios from 'axios';
+const baseUrl = 'https://tic-tac-toe-api2.herokuapp.com';
 
 class App extends Component {
   constructor(props) {
@@ -9,14 +11,16 @@ class App extends Component {
       xIsNext: true,
       stepNumber: 0,
       history: [
-        { squares: Array(9).fill(null) }
+        {squares: Array(9).fill(null)}
       ]
-    }
+    };
+    this.handshake = false;
   }
-  jumpTo(step){
+
+  jumpTo(step) {
     this.setState({
       stepNumber: step,
-      xIsNext: (step%2)===0
+      xIsNext: (step % 2) === 0
     })
   }
 
@@ -39,6 +43,17 @@ class App extends Component {
 
   }
 
+  componentDidMount() {
+    axios.get(baseUrl + '/')
+      .then(data => {
+        console.log(data);
+        this.setState({
+          ...this.state,
+          handshake: true
+        })
+      })
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -47,7 +62,9 @@ class App extends Component {
       const desc = move ? 'Go to #' + move : 'Start the Game';
       return (
         <li key={move}>
-          <button onClick={() => { this.jumpTo(move) }}>
+          <button onClick={() => {
+            this.jumpTo(move)
+          }}>
             {desc}
           </button>
         </li>
@@ -60,20 +77,21 @@ class App extends Component {
       status = 'Next Player is ' + (this.state.xIsNext ? 'X' : 'O');
     }
 
-
-    return (
-      <div className="game">
-        <div className="game-board">
-          <Board onClick={(i) => this.handleClick(i)}
-                 squares={current.squares} />
+    if (this.state.handshake) {
+      return (
+        <div className="game">
+          <div className="game-board">
+            <Board onClick={(i) => this.handleClick(i)}
+                   squares={current.squares}/>
+          </div>
+          <div className="game-info">
+            <div>{status}</div>
+            <ul>{moves}</ul>
+          </div>
         </div>
-        <div className="game-info">
-          <div>{status}</div>
-          <ul>{moves}</ul>
-        </div>
-
-      </div>
-    )
+      )
+    }
+    return (<div>Hello world</div>);
   }
 }
 
