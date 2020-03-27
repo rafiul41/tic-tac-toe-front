@@ -1,0 +1,84 @@
+.square {
+  float: left;
+  font-size: 50px;
+  font-weight: bold;
+  padding: 0;
+  text-align: center;
+  width: 80px;
+  line-height: 80px;
+  height: 80px;
+  display: inline-block;
+  text-decoration: none;
+  color: #fff;
+  background-color: #538fbe;
+  margin: 10px;
+  border: 1px solid #2d6898;
+  background-image: linear-gradient(to bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
+  background-image: -o-linear-gradient(to bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
+  background-image: -moz-linear-gradient(to bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
+  background-image: -webkit-linear-gradient(to bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
+  background-image: -ms-linear-gradient(to bottom, rgb(73, 132, 180) 0%, rgb(97, 155, 203) 100%);
+  background-image: -webkit-gradient(
+                  linear,
+                  left bottom,
+                  left top,
+                  color-stop(0, rgb(73, 132, 180)),
+                  color-stop(1, rgb(97, 155, 203))
+  );
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, .5);
+  -webkit-box-shadow: 0 6px 0 #2b638f, 0 3px 15px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 0 3px rgba(255, 255, 255, .5);
+  -moz-box-shadow: 0 6px 0 #2b638f, 0 3px 15px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 0 3px rgba(255, 255, 255, .5);
+  box-shadow: 0 6px 0 #2b638f, 0 3px 15px rgba(0, 0, 0, .4), inset 0 1px 0 rgba(255, 255, 255, .3), inset 0 0 3px rgba(255, 255, 255, .5);
+
+}
+
+.square:active {
+  background-image: linear-gradient(to bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
+  background-image: -o-linear-gradient(to bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
+  background-image: -moz-linear-gradient(to bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
+  background-image: -webkit-linear-gradient(to bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
+  background-image: -ms-linear-gradient(to bottom, rgb(88, 154, 204) 0%, rgb(90, 150, 199) 100%);
+
+  background-image: -webkit-gradient(
+                  linear,
+                  left bottom,
+                  left top,
+                  color-stop(0, rgb(88, 154, 204)),
+                  color-stop(1, rgb(90, 150, 199))
+  );
+}
+
+
+/* Board */
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+/* Game */
+.game {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: row;
+  margin: 0 auto;
+}
+
+/* Game Info */
+ul {
+  padding-left: 30px;
+}
+
+.game-info {
+  margin-left: 20px;
+}
+
+.status {
+  margin-bottom: 10px;
+}
