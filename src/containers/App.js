@@ -3,8 +3,17 @@ import React, {Component} from 'react';
 import Board from './../components/Board';
 import axios from 'axios';
 import Swal from "sweetalert2";
+const io = require('socket.io-client');
 
-const baseUrl = 'https://tic-tac-toe-api2.herokuapp.com';
+const env = 'dev';
+
+let baseUrl = 'https://tic-tac-toe-api2.herokuapp.com';
+
+if (env === 'dev') {
+  baseUrl = 'http://localhost:3001';
+}
+
+const socket = io(baseUrl);
 
 class App extends Component {
   constructor(props) {
@@ -54,15 +63,14 @@ class App extends Component {
       html: 'Please wait while the app connects with server',
       allowOutsideClick: false
     });
-    axios.get(baseUrl + '/')
-      .then(data => {
-        Swal.close();
-        console.log(data);
-        this.setState({
-          ...this.state,
-          handshake: true
-        })
-      })
+    socket.on('name', (data) => {
+      Swal.close();
+      this.setState({
+        ...this.state,
+        handshake: true
+      });
+      console.log(data);
+    })
   }
 
   render() {
