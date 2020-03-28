@@ -5,7 +5,7 @@ import axios from 'axios';
 import Swal from "sweetalert2";
 const io = require('socket.io-client');
 
-const env = 'dev';
+const env = 'prod';
 
 let baseUrl = 'https://tic-tac-toe-api2.herokuapp.com';
 
@@ -63,7 +63,7 @@ class App extends Component {
       html: 'Please wait while the app connects with server',
       allowOutsideClick: false
     });
-    socket.on('name', (data) => {
+    socket.on('handshake', (data) => {
       Swal.close();
       this.setState({
         ...this.state,
