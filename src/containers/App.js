@@ -2,6 +2,8 @@ import './App.scss';
 import React, {Component} from 'react';
 import Board from './../components/Board';
 import axios from 'axios';
+import Swal from "sweetalert2";
+
 const baseUrl = 'https://tic-tac-toe-api2.herokuapp.com';
 
 class App extends Component {
@@ -25,6 +27,7 @@ class App extends Component {
   }
 
   handleClick(i) {
+    console.log(this.state.xIsNext, i);
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
@@ -44,8 +47,16 @@ class App extends Component {
   }
 
   componentDidMount() {
+    Swal.fire({
+      onBeforeOpen: () => {
+        Swal.showLoading();
+      },
+      html: 'Please wait while the app connects with server',
+      allowOutsideClick: false
+    });
     axios.get(baseUrl + '/')
       .then(data => {
+        Swal.close();
         console.log(data);
         this.setState({
           ...this.state,
@@ -91,7 +102,7 @@ class App extends Component {
         </div>
       )
     }
-    return (<div>Hello world</div>);
+    return (<div>{''}</div>);
   }
 }
 
