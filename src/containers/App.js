@@ -3,9 +3,11 @@ import React, {Component} from 'react';
 import Board from './../components/Board';
 import axios from 'axios';
 import Swal from "sweetalert2";
+
 const io = require('socket.io-client');
 
 const env = 'prod';
+let guestId = localStorage.getItem('id');
 
 let baseUrl = 'https://tic-tac-toe-api2.herokuapp.com';
 
@@ -14,6 +16,7 @@ if (env === 'dev') {
 }
 
 const socket = io(baseUrl);
+let logs = [];
 
 class App extends Component {
   constructor(props) {
@@ -36,11 +39,26 @@ class App extends Component {
   }
 
   handleClick(i) {
-    console.log(this.state.xIsNext, i);
+    const player = this.state.xIsNext ? 'X' : 'O';
     const history = this.state.history.slice(0, this.state.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     const winner = calculateWinner(squares);
+
+    if (squares[i] === null && winner == null) {
+      axios.post(baseUrl + '/api/log', {
+        id: guestId,
+        action: 'Player ' + player + ' clicked on cell ' + i
+      })
+        .then(() => {
+          return axios.get(baseUrl + '/api/list?id=' + guestId)
+        })
+        .then(response => {
+          logs = response.data.data;
+          console.log(logs);
+        });
+    }
+
     if (winner || squares[i]) {
       return;
     }
@@ -56,21 +74,29 @@ class App extends Component {
   }
 
   componentDidMount() {
-    Swal.fire({
-      onBeforeOpen: () => {
-        Swal.showLoading();
-      },
-      html: 'Please wait while the app connects with server',
-      allowOutsideClick: false
-    });
-    socket.on('handshake', (data) => {
-      Swal.close();
+    if (!guestId) {
+      Swal.fire({
+        onBeforeOpen: () => {
+          Swal.showLoading();
+        },
+        html: 'Please wait while the app connects with server',
+        allowOutsideClick: false
+      });
+      socket.on('handshake', (data) => {
+        Swal.close();
+        this.setState({
+          ...this.state,
+          handshake: true
+        });
+        guestId = data;
+        localStorage.setItem('id', data);
+      })
+    } else {
       this.setState({
         ...this.state,
         handshake: true
       });
-      console.log(data);
-    })
+    }
   }
 
   render() {
@@ -99,14 +125,22 @@ class App extends Component {
     if (this.state.handshake) {
       return (
         <div className="game">
-          <div className="game-board">
-            <Board onClick={(i) => this.handleClick(i)}
-                   squares={current.squares}/>
+          <br/><br/><br/>
+          <div className="top-row">
+            <div className="game-board">
+              <Board onClick={(i) => this.handleClick(i)}
+                     squares={current.squares}/>
+            </div>
+            <div className="game-info">
+              <div>{status}</div>
+              <ul>{moves}</ul>
+            </div>
           </div>
-          <div className="game-info">
-            <div>{status}</div>
-            <ul>{moves}</ul>
-          </div>
+          <br/><br/>
+          <div className="logs"><strong>Logs of the game are below:</strong></div>
+          {logs.map(log => (
+            <div key={log._id}>{log.action}</div>
+          ))}
         </div>
       )
     }
