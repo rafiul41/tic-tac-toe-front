@@ -75,6 +75,7 @@ class App extends Component {
 
   componentDidMount() {
     if (!guestId) {
+      console.log('No guest Id found');
       Swal.fire({
         onBeforeOpen: () => {
           Swal.showLoading();
@@ -83,6 +84,7 @@ class App extends Component {
         allowOutsideClick: false
       });
       socket.on('handshake', (data) => {
+        console.log('Handshake is completed with socketId: ' + data);
         Swal.close();
         this.setState({
           ...this.state,
@@ -92,6 +94,7 @@ class App extends Component {
         localStorage.setItem('id', data);
       })
     } else {
+      console.log('Guest Id found');
       this.setState({
         ...this.state,
         handshake: true
