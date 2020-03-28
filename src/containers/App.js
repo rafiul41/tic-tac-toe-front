@@ -75,7 +75,7 @@ class App extends Component {
 
   componentDidMount() {
     if (!guestId) {
-      console.log('No guest Id found');
+      console.log('No guest Id found !');
       Swal.fire({
         onBeforeOpen: () => {
           Swal.showLoading();
