@@ -26,6 +26,9 @@ class App extends Component {
     })
       .then(() => {
         return this.updateLogs();
+      })
+      .catch(error => {
+        console.log('Log Posting Error: ' + error.message);
       });
     this.props.jumpToStep({step});
   }
@@ -45,6 +48,9 @@ class App extends Component {
         .then(() => {
           return this.updateLogs();
         })
+        .catch(error => {
+          console.log('Log Posting Error: ' + error.message);
+        });
     }
 
     if (winner || squares[i]) {
@@ -60,6 +66,9 @@ class App extends Component {
     axios.get(baseUrl + '/api/list?id=' + guestId)
       .then(response => {
         this.props.updateLog({data: response.data.data})
+      })
+      .catch(error => {
+        console.log('Log Fetching Error: ' + error.message);
       });
   }
 
