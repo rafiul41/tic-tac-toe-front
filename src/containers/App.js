@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import Board from './../components/Board';
 import axios from 'axios';
 import Swal from "sweetalert2";
+import {connect} from "react-redux";
 
 const io = require('socket.io-client');
 
@@ -18,20 +19,6 @@ if (env === 'dev') {
 const socket = io(baseUrl);
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      xIsNext: true,
-      stepNumber: 0,
-      history: [
-        {squares: Array(9).fill(null)}
-      ],
-      handshake: false,
-      logs: [],
-      isLogUpdating: false
-    };
-  }
-
   jumpTo(step) {
     axios.post(baseUrl + '/api/log', {
       id: guestId,
@@ -40,15 +27,12 @@ class App extends Component {
       .then(() => {
         return this.updateLogs();
       });
-    this.setState({
-      stepNumber: step,
-      xIsNext: (step % 2) === 0
-    })
+    this.props.jumpToStep({step});
   }
 
   handleClick(i) {
-    const player = this.state.xIsNext ? 'X' : 'O';
-    const history = this.state.history.slice(0, this.state.stepNumber + 1);
+    const player = this.props.xIsNext ? 'X' : 'O';
+    let history = this.props.history.slice(0, this.props.stepNumber + 1);
     const current = history[history.length - 1];
     const squares = current.squares.slice();
     const winner = calculateWinner(squares);
@@ -66,29 +50,16 @@ class App extends Component {
     if (winner || squares[i]) {
       return;
     }
-    squares[i] = this.state.xIsNext ? 'X' : 'O';
-    this.setState({
-      history: history.concat({
-        squares: squares
-      }),
-      xIsNext: !this.state.xIsNext,
-      stepNumber: history.length
-    });
-
+    squares[i] = this.props.xIsNext ? 'X' : 'O';
+    history = [...history, {squares}];
+    this.props.updateHistory({history, stepNumber: history.length - 1});
   }
 
   updateLogs() {
-    this.setState({
-      ...this.state,
-      isLogUpdating: true
-    });
+    this.props.changeUpdateStatus();
     axios.get(baseUrl + '/api/list?id=' + guestId)
       .then(response => {
-        this.setState({
-          ...this.state,
-          logs: response.data.data,
-          isLogUpdating: false
-        })
+        this.props.updateLog({data: response.data.data})
       });
   }
 
@@ -103,18 +74,12 @@ class App extends Component {
       });
       socket.on('handshake', (data) => {
         Swal.close();
-        this.setState({
-          ...this.state,
-          handshake: true
-        });
+        this.props.turnOnHandshake();
         guestId = data;
         localStorage.setItem('id', data);
       })
     } else {
-      this.setState({
-        ...this.state,
-        handshake: true
-      });
+      this.props.turnOnHandshake();
     }
   }
 
@@ -124,8 +89,8 @@ class App extends Component {
   }
 
   render() {
-    const history = this.state.history;
-    const current = history[this.state.stepNumber];
+    const history = this.props.history;
+    const current = history[this.props.stepNumber];
     const winner = calculateWinner(current.squares);
     const moves = history.map((step, move) => {
       const desc = move ? 'Go to #' + move : 'Start the Game';
@@ -143,10 +108,10 @@ class App extends Component {
     if (winner) {
       status = 'Winner is ' + winner;
     } else {
-      status = 'Next Player is ' + (this.state.xIsNext ? 'X' : 'O');
+      status = 'Next Player is ' + (this.props.xIsNext ? 'X' : 'O');
     }
 
-    if (this.state.handshake) {
+    if (this.props.handshake) {
       return (
         <div className="game">
           <br/><br/>
@@ -165,11 +130,11 @@ class App extends Component {
           <br/><br/>
           <div className="logs">
             <div><strong>Logs of the game are below:</strong></div>
-            {this.state.logs.length === 0 && this.state.isLogUpdating === false ? (
-              <div>No logs to show</div>) : this.state.logs.map(log => (
+            {this.props.logs.length === 0 && this.props.isLogUpdating === false ? (
+              <div>No logs to show</div>) : this.props.logs.map(log => (
               <div key={log._id}>{log.action}</div>
             ))}
-            {this.state.isLogUpdating ? (<div>Updating Logs ...</div>) : (<div>{' '}</div>)}
+            {this.props.isLogUpdating ? (<div>Updating Logs ...</div>) : (<div>{' '}</div>)}
           </div>
         </div>
       )
@@ -200,4 +165,25 @@ function calculateWinner(squares) {
   return null;
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    xIsNext: state.xIsNext,
+    stepNumber: state.stepNumber,
+    history: state.history,
+    handshake: state.handshake,
+    logs: state.logs,
+    isLogUpdating: state.isLogUpdating
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    jumpToStep: (payload) => dispatch({type: 'JUMP_TO', payload}),
+    turnOnHandshake: () => dispatch({type: 'HANDSHAKE'}),
+    updateLog: (payload) => dispatch({type: 'UPDATE_LOG', payload}),
+    changeUpdateStatus: () => dispatch({type: 'UPDATE_STATUS'}),
+    updateHistory: (payload) => dispatch({type: 'UPDATE_HISTORY', payload})
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
