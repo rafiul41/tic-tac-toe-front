@@ -3,6 +3,11 @@
   display: flex;
   flex-direction: column;
 
+  .reset-button {
+    background: #ff7136;
+    width: 300px;
+  }
+
   .top-row {
     display: flex;
     flex-direction: row;

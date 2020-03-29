@@ -118,6 +118,11 @@ class App extends Component {
     }
   }
 
+  resetGame() {
+    localStorage.clear();
+    window.location.reload();
+  }
+
   render() {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
@@ -144,6 +149,8 @@ class App extends Component {
     if (this.state.handshake) {
       return (
         <div className="game">
+          <br/><br/>
+          <button className="reset-button" onClick={this.resetGame}>RESET GAME</button>
           <br/><br/><br/>
           <div className="top-row">
             <div className="game-board">
