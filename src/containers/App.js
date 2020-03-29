@@ -16,7 +16,6 @@ if (env === 'dev') {
 }
 
 const socket = io(baseUrl);
-let logs = [];
 
 class App extends Component {
   constructor(props) {
@@ -26,12 +25,14 @@ class App extends Component {
       stepNumber: 0,
       history: [
         {squares: Array(9).fill(null)}
-      ]
+      ],
+      logs: []
     };
     this.handshake = false;
   }
 
   jumpTo(step) {
+    console.log(step);
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0
@@ -54,8 +55,10 @@ class App extends Component {
           return axios.get(baseUrl + '/api/list?id=' + guestId)
         })
         .then(response => {
-          logs = response.data.data;
-          console.log(logs);
+          this.setState({
+            ...this.state,
+            logs: response.data.data
+          })
         });
     }
 
@@ -75,7 +78,6 @@ class App extends Component {
 
   componentDidMount() {
     if (!guestId) {
-      console.log('No guest Id found !');
       Swal.fire({
         onBeforeOpen: () => {
           Swal.showLoading();
@@ -84,7 +86,6 @@ class App extends Component {
         allowOutsideClick: false
       });
       socket.on('handshake', (data) => {
-        console.log('Handshake is completed with socketId: ' + data);
         Swal.close();
         this.setState({
           ...this.state,
@@ -94,7 +95,6 @@ class App extends Component {
         localStorage.setItem('id', data);
       })
     } else {
-      console.log('Guest Id found');
       this.setState({
         ...this.state,
         handshake: true
@@ -140,10 +140,12 @@ class App extends Component {
             </div>
           </div>
           <br/><br/>
-          <div className="logs"><strong>Logs of the game are below:</strong></div>
-          {logs.map(log => (
-            <div key={log._id}>{log.action}</div>
-          ))}
+          <div className="logs">
+            <div><strong>Logs of the game are below:</strong></div>
+            {this.state.logs.length === 0 ? (<div>Loading logs...</div>) : this.state.logs.map(log => (
+              <div key={log._id}>{log.action}</div>
+            ))}
+          </div>
         </div>
       )
     }
