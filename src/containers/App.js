@@ -116,18 +116,20 @@ class App extends Component {
         <div className="game">
           <br/><br/>
           <button className="reset-button" onClick={this.resetGame}>RESET GAME</button>
-          <br/><br/><br/>
+          <br/><br/>
           <div className="top-row">
             <div className="game-board">
               <Board onClick={(i) => this.handleClick(i)}
                      squares={current.squares}/>
             </div>
             <div className="game-info">
-              <div>{status}</div>
+              <div>Status: {status}</div>
+              <br/>
+              <strong>History Navigation</strong>
               <ul>{moves}</ul>
             </div>
           </div>
-          <br/><br/>
+          <br/><br/><br/>
           <div className="logs">
             <div><strong>Logs of the game are below:</strong></div>
             {this.props.logs.length === 0 && this.props.isLogUpdating === false ? (

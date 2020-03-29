@@ -2,10 +2,12 @@
 .game {
   display: flex;
   flex-direction: column;
+  align-items: center;
 
   .reset-button {
     background: #ff7136;
-    width: 300px;
+    width: 200px;
+    height: 50px;
   }
 
   .top-row {
