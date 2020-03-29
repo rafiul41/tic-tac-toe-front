@@ -26,13 +26,20 @@ class App extends Component {
       history: [
         {squares: Array(9).fill(null)}
       ],
-      logs: []
+      handshake: false,
+      logs: [],
+      isLogUpdating: false
     };
-    this.handshake = false;
   }
 
   jumpTo(step) {
-    console.log(step);
+    axios.post(baseUrl + '/api/log', {
+      id: guestId,
+      action: 'Jumped to step: ' + step
+    })
+      .then(() => {
+        return this.updateLogs();
+      });
     this.setState({
       stepNumber: step,
       xIsNext: (step % 2) === 0
@@ -52,14 +59,8 @@ class App extends Component {
         action: 'Player ' + player + ' clicked on cell ' + i
       })
         .then(() => {
-          return axios.get(baseUrl + '/api/list?id=' + guestId)
+          return this.updateLogs();
         })
-        .then(response => {
-          this.setState({
-            ...this.state,
-            logs: response.data.data
-          })
-        });
     }
 
     if (winner || squares[i]) {
@@ -74,6 +75,21 @@ class App extends Component {
       stepNumber: history.length
     });
 
+  }
+
+  updateLogs() {
+    this.setState({
+      ...this.state,
+      isLogUpdating: true
+    });
+    axios.get(baseUrl + '/api/list?id=' + guestId)
+      .then(response => {
+        this.setState({
+          ...this.state,
+          logs: response.data.data,
+          isLogUpdating: false
+        })
+      });
   }
 
   componentDidMount() {
@@ -142,9 +158,11 @@ class App extends Component {
           <br/><br/>
           <div className="logs">
             <div><strong>Logs of the game are below:</strong></div>
-            {this.state.logs.length === 0 ? (<div>Loading logs...</div>) : this.state.logs.map(log => (
+            {this.state.logs.length === 0 && this.state.isLogUpdating === false ? (
+              <div>No logs to show</div>) : this.state.logs.map(log => (
               <div key={log._id}>{log.action}</div>
             ))}
+            {this.state.isLogUpdating ? (<div>Updating Logs ...</div>) : (<div>{' '}</div>)}
           </div>
         </div>
       )
